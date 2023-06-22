@@ -1,0 +1,11 @@
+FROM ubuntu:latest
+RUN apt update -y
+RUN apt install golint -y
+COPY build.sh .
+COPY BP-BASE-SHELL-STEPS .
+RUN chmod +x build.sh
+ENV ACTIVITY_SUB_TASK_CODE BP-GOLINT-TASK
+ENV SLEEP_DURATION 10s
+ENV VALIDATION_FAILURE_ACTION WARNING
+ENTRYPOINT [ "./build.sh" ]
+
