@@ -17,7 +17,7 @@ sleep $SLEEP_DURATION
 if [ -d $code ];then
   golint -r $WORKSPACE/$CODEBASE_DIR 
   logInfoMessage "Congratulations golint succeeded!!!"
-  generateOutput $ACTIVITY_SUB_TASK_CODE true "Congratulations bandit scan succeeded!!!"
+  generateOutput $ACTIVITY_SUB_TASK_CODE true "Congratulations golint scan succeeded!!!"
 else
   if [ "$VALIDATION_FAILURE_ACTION" == "FAILURE" ]
   then
