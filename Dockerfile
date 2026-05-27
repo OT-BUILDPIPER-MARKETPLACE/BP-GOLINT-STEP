@@ -15,17 +15,26 @@ RUN addgroup -g 65522 buildpiper && \
       /src/reports \
       /home/buildpiper/reports \
       /usr/local/bin && \
-    chown -R buildpiper:buildpiper /app /bp /opt /home/buildpiper /src /usr/local/bin /tmp
+    chown -R buildpiper:buildpiper \
+      /app /bp /opt /home/buildpiper /src /usr/local/bin /tmp
 
 # ---------------------------------------------------------------------
 # Install required packages
 # ---------------------------------------------------------------------
-RUN apk add --no-cache bash jq curl git gettext libintl
+RUN apk add --no-cache \
+    bash \
+    jq \
+    curl \
+    git \
+    gettext \
+    libintl \
+    dos2unix
 
 # ---------------------------------------------------------------------
 # Install golangci-lint
 # ---------------------------------------------------------------------
 ENV GOLANGCI_LINT_VERSION=v1.60.1
+
 RUN curl -sSfL \
     https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh \
     | sh -s -- -b /usr/local/bin ${GOLANGCI_LINT_VERSION}
@@ -34,14 +43,26 @@ RUN curl -sSfL \
 # Copy BuildPiper shell functions + script
 # ---------------------------------------------------------------------
 WORKDIR /app
-COPY --chown=buildpiper:buildpiper build.sh ./build.sh
-COPY --chown=buildpiper:buildpiper BP-BASE-SHELL-STEPS/ /opt/buildpiper/shell-functions/
-COPY --chown=buildpiper:buildpiper BP-BASE-SHELL-STEPS/data /opt/buildpiper/data
 
-RUN chmod +x /app/build.sh
+COPY --chown=buildpiper:buildpiper build.sh ./build.sh
+
+COPY --chown=buildpiper:buildpiper \
+    BP-BASE-SHELL-STEPS/ \
+    /opt/buildpiper/shell-functions/
+
+# ---------------------------------------------------------------------
+# Fix Windows line endings + permissions
+# ---------------------------------------------------------------------
+RUN find /opt/buildpiper/shell-functions \
+    -type f \
+    -name "*.sh" \
+    -exec dos2unix {} \; && \
+    dos2unix /app/build.sh && \
+    chmod +x /app/build.sh
 
 # ---------------------------------------------------------------------
 # Switch to non-root and run
 # ---------------------------------------------------------------------
 USER buildpiper
+
 ENTRYPOINT ["./build.sh"]
