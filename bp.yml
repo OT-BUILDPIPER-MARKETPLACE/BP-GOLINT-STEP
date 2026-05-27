@@ -1,0 +1,2 @@
+image: registry.buildpiper.in/impl/golint
+current tag: k8s_bp_nr_1.4
